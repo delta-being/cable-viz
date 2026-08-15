@@ -105,11 +105,7 @@ tweak:  # optional tweaking of .gv output
                           #                  but unavailable for auto-conversion
   show_equiv: <bool>      # defaults to false; can auto-convert between mm2 and AWG
                           # and display the result when set to true
-  length: <int/float>[ <unit>]  # <int/float> is assumed to be in meters unless <unit> is specified
-                                # e.g. length: 2.5 -> assumed to be 2.5 m
-                                # or   length: 2.5 ft -> "ft" is used as the unit
-                                # Units are not converted during BOM generation;
-                                # different units result in separate BOM entries.
+  length: <int/float>[ <tolerance_string> ][ <unit> ]  # See below
   shield: <bool/color>  # defaults to false
                         # setting to true will display the shield as a thin black line
                         # using a color (see below) will render the shield in that color
@@ -199,6 +195,23 @@ connections:
 - `<pin>` may reference a pin's unique ID (as per the connector's `pins` attribute, auto-numbered from 1 by default) or its label (as per `pinlabels`).
 - `<wire>` may reference a wire's number within a cable/bundle, its label (as per `wirelabels`) or, if unambiguous, its color.
 - For `<arrow>`, see below.
+
+#### Length
+Length and tolerance information must be provided in one of the following formats:
+- `<int/float>` will generate a single length value with no tolerance:
+  - `25.3 mm` -> 25.3 mm
+- `<int/float> - <int/float>` will generate an length range:
+  - `33.4 - 33.6 m` -> 33.4 - 33.6 m
+- `<int/float> +- <int/float>` will generate a length with a symmetric tolerance:
+  - `124 +- 1 ft` -> 124 (± 1) ft
+- `<int/float> + <int/float> - <int float>` will generate a length with an asymmetric tolerance:
+  - `12.2 + 0.4 - 0.1 yd` -> 12.2 (+ 0.4/- 0.1) yd 
+
+If no length unit is provided, length will be assumed to be in millimetres, for example:
+- `564` -> 564 mm
+- `564 in` -> 564 in
+
+Length units are not converted when creating BoMs - different length units will result in different BoM entries.
 
 ### Single connections
 

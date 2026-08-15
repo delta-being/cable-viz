@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import re
 from dataclasses import InitVar, dataclass, field
 from enum import Enum, auto
 from pathlib import Path
@@ -257,8 +258,11 @@ class Cable:
     gauge: Optional[float] = None
     gauge_unit: Optional[str] = None
     show_equiv: bool = False
-    length: float = 0
-    length_unit: Optional[str] = None
+    length: float = None
+    max_length: Optional[float] = None
+    min_length: Optional[float] = None
+    length_suffix: Optional[str] = None
+    length_unit: str = None
     color: Optional[Color] = None
     wirecount: Optional[int] = None
     shield: Union[bool, Color] = False
@@ -301,27 +305,61 @@ class Cable:
         else:
             pass  # gauge not specified
 
-        if isinstance(self.length, str):  # length and unit specified
+        if isinstance(self.length, str):
+            
+#           Check there are no special characters in the length string, remove any spaces, then split the string at plus or minus signs
             try:
-                L, u = self.length.split(" ")
-                L = float(L)
+                length_string_conditioned = self.length.replace(" ", "")
+                if re.search(r"[^0-9a-zA-Z\.\+\-%]+", length_string_conditioned):
+                    raise SyntaxError(f"Error processing length information for cable {self.name}\nHint: Length information string must only contain letters, numbers, and the plus, minus, percent, and full stop symbols")
+                else:
+                    length_string_list = list(filter(None, re.split("([+-])", length_string_conditioned)))
             except Exception:
-                raise Exception(
-                    f"Cable {self.name} length={self.length} - Length must be a number, or number and unit separated by a space"
-                )
-            self.length = L
-            if self.length_unit is not None:
-                print(
-                    f"Warning: Cable {self.name} length_unit={self.length_unit} is ignored because its length contains {u}"
-                )
-            self.length_unit = u
-        elif not isinstance(self.length, (int, float)):
-            raise Exception(f"Cable {self.name} length has a non-numeric value")
-        elif self.length_unit is None:
-            self.length_unit = "m"
+                raise SyntaxError(f"Error processing wire length information for cable {self.name}\nHint: Length information must be a valid string - see documentation for more information")
+
+            try:
+                if re.search(r"[a-zA-Z%]+", self.length):
+                    self.length_unit = re.search(r"[a-zA-Z%]+", self.length).group(0)
+                else:
+                    self.length_unit = "mm"
+            except Exception:
+                raise SyntaxError(f"Error processing wire length information for cable {self.name} - could not process length unit")
+            
+#           Store the substrings in variables
+            length_prefix_none = ""
+            length_prefix_plus = ""
+            length_prefix_minus = ""
+            
+            try:
+                for i, substring in enumerate(length_string_list):
+                    if i == 0:
+                        length_prefix_none = re.search(r"[0-9\.]+", substring).group(0)
+                    elif substring == "+":
+                        if length_string_list[i+1] == "-":
+                            length_prefix_plus = re.search(r"[0-9\.]+", length_string_list[i+2]).group(0)
+                        else:
+                            length_prefix_plus = re.search(r"[0-9\.]+", length_string_list[i+1]).group(0)
+                    elif substring == "-" and not length_string_list[i-1] == "+":
+                        length_prefix_minus = re.search(r"[0-9\.]+", length_string_list[i+1]).group(0)
+                    else:
+                        pass        
+            except Exception:
+                raise SyntaxError(f"Error processing wire length information for cable {self.name}\nHint: Length information must not end with a plus or minus symbol - see documentation for more information")
+
+#           Format the tolerance string to append to the length measurement based on the substrings found above            
+            try:
+                self.length = float(length_prefix_none)
+                if length_prefix_none != "" and length_prefix_plus != "" and length_prefix_minus == "":
+                    self.length_suffix = " (± " + length_prefix_plus + ") "
+                elif length_prefix_none != "" and length_prefix_minus != "" and length_prefix_plus == "":
+                    self.length_suffix = " - " + length_prefix_minus + " "
+                elif length_prefix_none != "" and length_prefix_plus != "" and length_prefix_minus != "":
+                    self.length_suffix = " (+ " + length_prefix_plus + " / - " + length_prefix_minus + ") "
+            except Exception:
+                raise Exception(f"Error processing wire length information for cable {self.name}\nHint: See documentation for correct syntax")
 
         self.connections = []
-
+        
         if self.wirecount:  # number of wires explicitly defined
             if self.colors:  # use custom color palette (partly or looped if needed)
                 pass

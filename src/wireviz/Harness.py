@@ -302,10 +302,10 @@ class Harness:
                 # Only convert units we actually know about, i.e. currently
                 # mm2 and awg --- other units _are_ technically allowed,
                 # and passed through as-is.
-                if cable.gauge_unit == "mm\u00B2":
+                if cable.gauge_unit == "mm\u00b2":
                     awg_fmt = f" ({awg_equiv(cable.gauge)} AWG)"
                 elif cable.gauge_unit.upper() == "AWG":
-                    awg_fmt = f" ({mm2_equiv(cable.gauge)} mm\u00B2)"
+                    awg_fmt = f" ({mm2_equiv(cable.gauge)} mm\u00b2)"
 
             # fmt: off
             rows = [[f'{html_bgcolor(cable.bgcolor_title)}{remove_links(cable.name)}'
@@ -322,7 +322,7 @@ class Harness:
                      f'{cable.wirecount}x' if cable.show_wirecount else None,
                      f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else None,
                      '+ S' if cable.shield else None,
-                     f'{cable.length} {cable.length_unit}' if cable.length > 0 else None,
+                     f'{cable.length:g}{cable.length_suffix}{cable.length_unit}' if cable.length else None,
                      translate_color(cable.color, self.options.color_mode) if cable.color else None,
                      html_colorbar(cable.color)],
                     '<!-- wire table -->',
