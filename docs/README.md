@@ -4,18 +4,18 @@
 cable-viz is a program for generating cable harness drawings from YAML input. It was forked from WireViz on 9th of August 2026.
 
 ## Why cable-viz?
-WireViz is an awesome tool but it's missing some features that would be really useful in my day-to-day work, and development seems to have slowed on the project. I'm keen to make some changes, so I thought I'd make it public and see if anyone else would like to join in.
+WireViz is an awesome tool but it's missing some features that would be really useful in my day-to-day work, and development seems to have slowed on the project. I'm keen to make some changes, please join in if you would like to see it improve!
 
 ## Project goals
 My goals for this project are currently driven by my own work requirements, and will include (in no particular order):
-- Tolerance information for wire and cable lengths
+- ~~Tolerance information for wire and cable lengths~~ Done 15/08/2026, could do with polish but it is functional
 - PDF output
 - Drawing frames on PDF output
 - Support for displaying terminal types within connectors
 - Support for conduits
 - Wire/cable cut list
 
-If I or others find the time, I would also like to make the tool more user friendly - possibly by adding a GUI.
+If I or others find the time, I would also like to make the tool more user friendly - possibly by adding a web browser-based GUI.
 
 ## Project milestones
 - Version 0.1 - As forked from WireViz, with name changed and at least one of the above goals met
