@@ -5,14 +5,14 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
-from src.wireviz import APP_URL, CMD_NAME, __version__
+from src.cableviz import APP_URL, CMD_NAME, __version__
 
 README_PATH = Path(__file__).parent / "docs" / "README.md"
 
 setup(
     name=CMD_NAME,
     version=__version__,
-    author="Daniel Rojas",
+    author="Delta",
     # author_email='',
     description="Easily document cables and wiring harnesses",
     long_description=open(README_PATH).read(),
@@ -31,7 +31,7 @@ setup(
     packages=find_packages("src"),
     entry_points={
         "console_scripts": [
-            "wireviz=wireviz.wv_cli:wireviz",
+            "cableviz=cableviz.cv_cli:cableviz",
         ],
     },
     classifiers=[
