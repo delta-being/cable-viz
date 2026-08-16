@@ -214,11 +214,31 @@ class Harness:
                     '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'
                 )
 
-                for pinindex, (pinname, pinlabel, pincolor) in enumerate(
+                for pinindex, (pinname, pinlabel, pin_terminal, pincolor) in enumerate(
                     zip_longest(
-                        connector.pins, connector.pinlabels, connector.pincolors
+                        connector.pins, connector.pinlabels, connector.pin_terminals, connector.pincolors
                     )
                 ):
+                    if pinindex == 0:
+                        pinhtml.append("   <tr>")
+                        if connector.ports_left:
+                            pinhtml.append(f"    <td>Pin name</td>")
+                            if pinlabel:
+                                pinhtml.append(f"    <td>Pin label</td>")
+                            if pin_terminal:
+                                pinhtml.append(f"    <td>Terminal type</td>")
+                            if pincolor:
+                                pinhtml.append(f'    <td colspan="2">Pin colour</td>')
+                        elif connector.ports_right:
+                            if pincolor:
+                                pinhtml.append(f'    <td colspan="2">Pin colour</td>')
+                            if pin_terminal:
+                                pinhtml.append(f"    <td>Terminal type</td>")
+                            if pinlabel:
+                                pinhtml.append(f"    <td>Pin label</td>")
+                            pinhtml.append(f"    <td>Pin name</td>")
+                        pinhtml.append("   </tr>")
+                        
                     if (
                         connector.hide_disconnected_pins
                         and not connector.visible_pins.get(pinname, False)
@@ -226,25 +246,54 @@ class Harness:
                         continue
 
                     pinhtml.append("   <tr>")
+
                     if connector.ports_left:
                         pinhtml.append(f'    <td port="p{pinindex+1}l">{pinname}</td>')
-                    if pinlabel:
-                        pinhtml.append(f"    <td>{pinlabel}</td>")
-                    if connector.pincolors:
-                        if pincolor in cv_colors._color_hex.keys():
-                            # fmt: off
-                            pinhtml.append(f'    <td sides="tbl">{translate_color(pincolor, self.options.color_mode)}</td>')
-                            pinhtml.append( '    <td sides="tbr">')
-                            pinhtml.append( '     <table border="0" cellborder="1"><tr>')
-                            pinhtml.append(f'      <td bgcolor="{cv_colors.translate_color(pincolor, "HEX")}" width="8" height="8" fixedsize="true"></td>')
-                            pinhtml.append( '     </tr></table>')
-                            pinhtml.append( '    </td>')
-                            # fmt: on
-                        else:
-                            pinhtml.append('    <td colspan="2"></td>')
+
+                        if pinlabel:
+                            pinhtml.append(f"    <td>{pinlabel}</td>")
+
+                        if pin_terminal:
+                            pinhtml.append(f"    <td>{pin_terminal}</td>")
+                        
+                        if connector.pincolors:
+
+                            if pincolor in cv_colors._color_hex.keys():
+                                # fmt: off
+                                pinhtml.append(f'    <td sides="tbl">{translate_color(pincolor, self.options.color_mode)}</td>')
+                                pinhtml.append( '    <td sides="tbr">')
+                                pinhtml.append( '     <table border="0" cellborder="1"><tr>')
+                                pinhtml.append(f'      <td bgcolor="{cv_colors.translate_color(pincolor, "HEX")}" width="8" height="8" fixedsize="true"></td>')
+                                pinhtml.append( '     </tr></table>')
+                                pinhtml.append( '    </td>')
+                                # fmt: on
+                            else:
+                                pinhtml.append('    <td colspan="2"></td>')
 
                     if connector.ports_right:
+                        
+                        if connector.pincolors:
+
+                            if pincolor in cv_colors._color_hex.keys():
+                                # fmt: off
+                                pinhtml.append(f'    <td sides="tbl">{translate_color(pincolor, self.options.color_mode)}</td>')
+                                pinhtml.append( '    <td sides="tbr">')
+                                pinhtml.append( '     <table border="0" cellborder="1"><tr>')
+                                pinhtml.append(f'      <td bgcolor="{cv_colors.translate_color(pincolor, "HEX")}" width="8" height="8" fixedsize="true"></td>')
+                                pinhtml.append( '     </tr></table>')
+                                pinhtml.append( '    </td>')
+                                # fmt: on
+                            else:
+                                pinhtml.append('    <td colspan="2"></td>')
+
+                        if pin_terminal:
+                            pinhtml.append(f"    <td>{pin_terminal}</td>")
+                                
+                        if pinlabel:
+                            pinhtml.append(f"    <td>{pinlabel}</td>")
+                        
                         pinhtml.append(f'    <td port="p{pinindex+1}r">{pinname}</td>')
+
                     pinhtml.append("   </tr>")
 
                 pinhtml.append("  </table>")

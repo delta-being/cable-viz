@@ -156,6 +156,7 @@ class Connector:
     pins: List[Pin] = field(default_factory=list)
     pinlabels: List[Pin] = field(default_factory=list)
     pincolors: List[Color] = field(default_factory=list)
+    pin_terminals: List[Terminal] = field(default_factory=list)
     color: Optional[Color] = None
     show_name: Optional[bool] = None
     show_pincount: Optional[bool] = None
